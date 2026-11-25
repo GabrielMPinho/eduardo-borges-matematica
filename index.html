@@ -11,6 +11,10 @@
 <meta property="og:image" content="assets/img/eduardo-quadro.jpg">
 <meta name="theme-color" content="#110F0E">
 <link rel="icon" type="image/png" href="assets/img/monograma.png">
+<script>
+/* liga a intro antes da primeira pintura (evita piscar o site antes da tela escura) */
+(function(){try{var r=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!r&&sessionStorage.getItem('eb-intro-seen')!=='1')document.documentElement.classList.add('eb-intro-on');}catch(e){}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>
@@ -50,12 +54,38 @@ html.eb-js .eb-anim{opacity:0;transform:translate3d(var(--dx),var(--dy),0);trans
 html.eb-js .eb-anim.is-in{opacity:1;transform:none}
 @media (max-width:767px){.eb-anim[data-anim="fadeInLeft"],.eb-anim[data-anim="fadeInRight"]{--dx:0px;--dy:20px}}
 @media (prefers-reduced-motion:reduce){html.eb-js .eb-anim{opacity:1 !important;transform:none !important;transition:none !important}}
+
+/* Intro: só as letras gregas (Σ e β) — contorno desenhado, preenchimento amarelo, logo cresce e a tela some (~3.5s, 1x por sessão) */
+.eb-intro{display:none}
+html.eb-intro-on{overflow:hidden}
+html.eb-intro-on .eb-intro{display:flex;position:fixed;inset:0;z-index:100;background:#110F0E;align-items:center;justify-content:center;animation:ebIntroOut .8s cubic-bezier(.65,0,.35,1) 2.7s forwards}
+.eb-intro svg{width:min(42vw,220px);height:auto;overflow:visible;animation:ebIntroScale 1s cubic-bezier(.22,.61,.36,1) 2.55s forwards}
+.eb-intro-piece{fill:#FBCB03;fill-opacity:0;stroke:#FBCB03;stroke-width:6;stroke-linejoin:round;stroke-dasharray:1 1;stroke-dashoffset:1}
+html.eb-intro-on .eb-intro-piece{animation:ebDraw 1.15s cubic-bezier(.65,0,.35,1) forwards,ebFill .65s ease forwards}
+html.eb-intro-on .eb-intro-sigma{animation-delay:.2s,1.35s}
+html.eb-intro-on .eb-intro-beta{animation-delay:.55s,1.65s}
+.eb-intro-skip{position:absolute;right:24px;bottom:24px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(253,252,249,.22);background:transparent;color:#B0AEA8;font:500 14px 'Inter Tight',sans-serif;cursor:pointer;transition:color .2s,border-color .2s}
+.eb-intro-skip:hover{color:#FDFCF9;border-color:rgba(253,252,249,.5)}
+@keyframes ebDraw{to{stroke-dashoffset:0}}
+@keyframes ebFill{to{fill-opacity:1;stroke-opacity:0}}
+@keyframes ebIntroScale{to{transform:scale(1.08)}}
+@keyframes ebIntroOut{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.eb-intro{display:none !important}}
 .eb-pill{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #E0DED8;background:#FDFCF9;color:#181614;font:500 15px 'Inter Tight',sans-serif;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .eb-pill[aria-pressed="true"]{border-color:#110F0E;background:#110F0E;color:#FDFCF9}
 </style>
 </head>
 <body>
 <div style="width: 100%; overflow-x: clip; font-family: Inter, system-ui, sans-serif; color: #181614; background: #FDFCF9; font-size: 16px; line-height: 1.6">
+
+<!-- INTRO -->
+<div class="eb-intro" role="presentation">
+<svg viewBox="0 0 738 730" role="img" aria-label="Monograma Eduardo Borges: letras gregas sigma e beta">
+<path class="eb-intro-piece eb-intro-sigma" pathLength="1" fill-rule="evenodd" d="M368.9 468.8C368.8 233.9 368.6 208.4 367.2 216.0C366.0 223.1 365.7 244.0 365.3 344.2L364.9 464.0L254.4 464.0L143.8 464.0L146.5 460.8C148.0 459.0 156.1 450.1 164.4 441.1C172.7 432.0 185.3 418.3 192.4 410.6C212.8 388.2 243.8 354.6 283.6 311.6C303.9 289.6 322.9 269.0 325.9 265.8C330.6 260.6 331.0 259.8 329.9 258.2C329.1 257.3 323.5 250.7 317.5 243.5C311.4 236.3 291.1 212.5 272.5 190.5C253.8 168.5 235.3 146.9 231.5 142.4C227.7 137.9 219.8 128.7 214.0 121.9C208.3 115.1 192.9 97.1 180.0 82.0C167.0 66.9 156.1 53.9 155.6 53.2C155.0 52.2 174.5 52.0 257.7 52.3C323.8 52.5 362.0 53.0 364.8 53.7L369.0 54.7L369.0 27.4L369.0 0.0L187.5 0.0C87.7 0.0 6.0 0.3 6.0 0.8C6.0 1.2 12.7 9.1 20.7 18.5C63.5 68.0 235.0 268.4 235.0 268.9C235.0 269.3 224.3 281.3 211.3 295.5C198.3 309.8 173.9 336.6 157.1 355.0C64.1 457.0 7.7 517.8 1.7 522.9C0.7 523.6 0.0 524.6 0.0 525.1C0.0 525.6 78.5 526.0 182.5 526.0L365.0 526.0L365.0 627.3C365.0 683.1 365.3 729.0 365.7 729.3C369.0 732.7 369.0 736.4 368.9 468.8Z"/>
+<path class="eb-intro-piece eb-intro-beta" pathLength="1" fill-rule="evenodd" d="M441.0 670.5C441.0 637.8 441.2 611.0 441.4 611.0C441.7 611.0 445.4 612.6 449.6 614.5C491.9 633.8 552.8 636.1 603.5 620.4C657.3 603.7 697.8 573.4 719.3 533.6C733.1 508.0 738.9 482.7 737.7 453.5C734.7 385.0 691.8 338.0 614.7 318.6L597.5 314.3L604.0 312.2C623.2 306.3 645.8 295.7 661.0 285.5C688.1 267.4 703.3 248.3 712.4 220.9C717.1 206.7 718.4 196.7 717.7 179.6C716.6 153.1 708.0 131.7 690.9 112.3C663.0 80.9 616.3 63.5 560.0 63.6C522.9 63.6 495.3 70.1 464.6 85.8C458.2 89.0 452.8 91.4 452.5 91.2C452.2 90.9 452.0 70.3 452.0 45.3L452.0 0.0L408.5 0.0L365.0 0.0L365.0 26.8L365.0 53.7L373.5 56.0C390.3 60.4 405.9 69.7 417.9 82.5C424.0 89.1 434.0 101.8 434.0 102.9C433.9 103.2 431.2 105.5 427.9 108.0C418.3 115.1 403.1 130.8 395.8 141.1C384.6 156.7 375.0 178.4 370.5 198.3C365.3 220.9 365.6 205.8 365.3 476.5C365.1 614.5 365.2 728.0 365.4 728.7C365.8 729.7 373.8 730.0 403.5 730.0L441.0 730.0L441.0 670.5ZM506.5 604.0C497.0 602.7 484.0 598.6 475.5 594.2C465.4 589.0 453.5 576.9 448.7 567.0C441.1 551.4 441.6 559.7 441.2 441.2L440.9 335.0L490.6 335.0C530.3 335.0 542.3 335.3 550.7 336.6C578.6 340.7 600.3 351.1 616.6 368.2C628.1 380.4 635.2 393.7 640.1 412.7C648.3 445.0 646.3 489.1 635.1 521.4C620.3 564.2 587.5 593.8 545.3 602.5C535.8 604.5 516.0 605.2 506.5 604.0ZM441.3 244.8C441.7 177.0 441.7 177.8 447.1 161.9C455.5 137.1 474.9 115.8 499.4 104.4C531.2 89.8 571.3 91.8 597.0 109.3C607.7 116.6 617.5 127.9 623.4 139.6C630.7 154.3 634.0 167.9 634.7 187.1C636.1 222.0 627.2 248.9 607.0 270.4C591.5 286.9 568.3 299.4 543.8 304.4C529.6 307.3 516.6 308.0 479.0 308.0L440.9 308.0L441.3 244.8Z"/>
+</svg>
+<button type="button" class="eb-intro-skip" id="eb-intro-skip">Pular intro</button>
+</div>
 
 <!-- HEADER -->
 <header class="eb-header is-dark">
@@ -307,6 +337,7 @@ Enviar pelo WhatsApp
 </div>
 <script>
 (function () {
+  var self = {};
 
   // Formulário -> mensagem pronta no WhatsApp
   var fmt = '';
@@ -330,6 +361,8 @@ Enviar pelo WhatsApp
   });
   ['f-nome', 'f-tel', 'f-serie'].forEach(function (id) { var el = document.getElementById(id); if (el) el.addEventListener('input', buildHref); });
   if (link) buildHref();
+  var skip = document.getElementById('eb-intro-skip');
+  if (skip) skip.addEventListener('click', function () { if (self._endIntro) self._endIntro(); });
 
 
     var root = document.documentElement;
@@ -367,18 +400,40 @@ Enviar pelo WhatsApp
     hUpdate();
     var root = document.documentElement;
     var els = Array.prototype.slice.call(document.querySelectorAll('.eb-anim'));
-    if (!('IntersectionObserver' in window)) return;
+    // Intro (1x por sessão, pula com prefers-reduced-motion)
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var seen = false;
+    try { seen = window.sessionStorage.getItem('eb-intro-seen') === '1'; } catch (e) {}
+    var startReveal = function () {};
+    var endIntro = function () {
+      if (self._introDone) return;
+      self._introDone = true;
+      window.clearTimeout(self._introT1); window.clearTimeout(self._introT2);
+      root.classList.remove('eb-intro-on');
+      try { window.sessionStorage.setItem('eb-intro-seen', '1'); } catch (e) {}
+      startReveal();
+    };
+    self._endIntro = endIntro;
+    var playIntro = !reduce && !seen;
+    if (playIntro) {
+      root.classList.add('eb-intro-on');
+      self._introT1 = window.setTimeout(function () { startReveal(); }, 2700);
+      self._introT2 = window.setTimeout(endIntro, 3500);
+    }
+    if (!('IntersectionObserver' in window)) { endIntro(); return; }
     els.forEach(function (el) {
       el.style.transitionDelay = (parseInt(el.getAttribute('data-delay') || '0', 10) * 0.6) + 'ms';
     });
     root.classList.add('eb-js');
-    var _io = new IntersectionObserver(function (entries, io) {
+    self._io = new IntersectionObserver(function (entries, io) {
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-    var io = _io;
-    els.forEach(function (el) { io.observe(el); });
+    var io = self._io;
+    var started = false;
+    startReveal = function () { if (started) return; started = true; els.forEach(function (el) { io.observe(el); }); };
+    if (!playIntro) startReveal();
   
 })();
 </script>
